@@ -43,8 +43,8 @@ namespace Dispatcher.DAL.Repositories
 
         public void Dispose()
         {
-            _currentTransaction.Dispose();
             _currentTransaction?.Dispose();
+            _applicationContext?.Dispose();
         }
 
         public async Task RollbackAsync()

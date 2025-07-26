@@ -5,7 +5,9 @@ VisualStudioVersion = 17.10.35027.167
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dispatcher", "Dispatcher\Dispatcher.csproj", "{00CBDCF6-4CBB-436B-BC94-9DA6F5376E9B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dispatcher.DAL", "Dispatcher.DAL\Dispatcher.DAL.csproj", "{580AB274-39B4-4763-A58A-B099A795542A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dispatcher.DAL", "Dispatcher.DAL\Dispatcher.DAL.csproj", "{580AB274-39B4-4763-A58A-B099A795542A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dispatcher.BLL", "Dispatcher.BLL\Dispatcher.BLL.csproj", "{EDE3D589-E595-4DFB-85E2-A0DD015B0330}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{580AB274-39B4-4763-A58A-B099A795542A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{580AB274-39B4-4763-A58A-B099A795542A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{580AB274-39B4-4763-A58A-B099A795542A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EDE3D589-E595-4DFB-85E2-A0DD015B0330}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EDE3D589-E595-4DFB-85E2-A0DD015B0330}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EDE3D589-E595-4DFB-85E2-A0DD015B0330}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EDE3D589-E595-4DFB-85E2-A0DD015B0330}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
