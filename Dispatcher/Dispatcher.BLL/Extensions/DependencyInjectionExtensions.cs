@@ -16,6 +16,8 @@ namespace Dispatcher.BLL.Extensions
 
             services.AddTransient<IResponseDeserializer, TextPlainResponseDeserializer>();
 
+            services.AddHttpClient();
+
             services.AddTransient<IApiService>(x => new ApiService(
                 x.GetService<IHttpClientFactory>(),
                 x.GetServices<IResponseDeserializer>(),

@@ -4,6 +4,6 @@
     {
         string ContentType { get; }
 
-        object Deserialize(string content, Type? responseType = null);
+        object Deserialize(string content, Type responseType);
     }
 }
