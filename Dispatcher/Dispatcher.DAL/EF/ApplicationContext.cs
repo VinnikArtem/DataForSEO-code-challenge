@@ -10,6 +10,8 @@ namespace Dispatcher.DAL.EF
 
         public DbSet<FileProcessingTask> FileProcessingTasks { get; set; }
 
+        public DbSet<InvalidLine> InvalidLines { get; set; }
+
         public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
         {
         }

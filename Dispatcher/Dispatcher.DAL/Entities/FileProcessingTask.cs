@@ -16,6 +16,10 @@ namespace Dispatcher.DAL.Entities
 
         public Guid SuperTaskId { get; set; }
 
+        public bool IsFileCorrupted { get; set; }
+
         public SuperTask? SuperTask { get; set; }
+
+        public ICollection<InvalidLine>? InvalidLines { get; set; }
     }
 }

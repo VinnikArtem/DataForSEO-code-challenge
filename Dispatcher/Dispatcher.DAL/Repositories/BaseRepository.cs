@@ -2,6 +2,7 @@
 using Dispatcher.DAL.Entities;
 using Dispatcher.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Expressions;
 
 namespace Dispatcher.DAL.Repositories
@@ -22,16 +23,26 @@ namespace Dispatcher.DAL.Repositories
             await _entities.AddAsync(entity);
         }
 
-        public async Task<IEnumerable<TEntity>> GetAllAsync()
+        public async Task<IEnumerable<TEntity>> GetAllAsync(Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null)
         {
-            return await _entities.ToListAsync();
+            IQueryable<TEntity> query = _entities.AsNoTracking();
+
+            if (include != null) query = include(query);
+
+            return await query.ToListAsync();
         }
 
-        public async Task<TEntity> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
+        public async Task<TEntity> GetFirstOrDefaultAsync(
+            Expression<Func<TEntity, bool>> predicate,
+            Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null)
         {
             if (predicate == null) return default;
 
-            return await _entities.FirstOrDefaultAsync(predicate);
+            IQueryable<TEntity> query = _entities.AsNoTracking();
+
+            if (include != null) query = include(query);
+
+            return await query.FirstOrDefaultAsync(predicate);
         }
 
         public async Task UpdateAsync(TEntity entity)

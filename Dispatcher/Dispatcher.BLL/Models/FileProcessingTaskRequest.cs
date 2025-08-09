@@ -16,6 +16,10 @@ namespace Dispatcher.BLL.Models
 
         public FileProcessingTaskStatus Status { get; set; }
 
+        public bool IsFileCorrupted { get; set; }
+
+        public IEnumerable<int> InvalidLines { get; set; } = [];
+
         public Guid SuperTaskId { get; set; }
     }
 }

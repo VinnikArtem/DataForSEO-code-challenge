@@ -19,7 +19,7 @@ namespace TaskProcessor.Worker.Infrastructure.Models
 
         public Guid SuperTaskId { get; set; }
 
-        public ConcurrentBag<int> InvalidLines { get; } = [];
+        public ConcurrentBag<int> InvalidLines { get; set; } = [];
 
         public bool IsFileCorrupted { get; set; }
     }

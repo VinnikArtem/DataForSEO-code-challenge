@@ -19,7 +19,9 @@ namespace Dispatcher.BLL.Mappers
                     SuperTaskId = t.SuperTaskId,
                     HighVolumeKeywordsCount = t.HighVolumeKeywordsCount,
                     MisspelledKeywordsCount = t.MisspelledKeywordsCount,
-                    LinesCount = t.LinesCount
+                    LinesCount = t.LinesCount,
+                    IsFileCorrupted = t.IsFileCorrupted,
+                    InvalidLines = t.InvalidLines.Select(l => l.LineNumber)
                 })));
         }
     }

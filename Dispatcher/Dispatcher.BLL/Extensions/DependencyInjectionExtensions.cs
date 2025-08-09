@@ -29,9 +29,10 @@ namespace Dispatcher.BLL.Extensions
             services.AddSingleton<IRabbitMqConnectionManager, RabbitMqConnectionManager>();
             services.AddScoped<IRabbitMQPublisher, RabbitMQPublisher>();
 
-            services.AddAutoMapper(cfg => { }, typeof(SuperTaskProfile));
+            services.AddAutoMapper(cfg => { }, typeof(SuperTaskProfile), typeof(FileProcessingTaskProfile));
 
             services.AddScoped<ITaskService, TaskService>();
+            services.AddScoped<IFileProcessingTaskService, FileProcessingTaskService>();
         }
     }
 }

@@ -11,6 +11,8 @@ namespace Dispatcher.DAL.Configurations
             builder.HasKey(x => x.Id);
 
             builder.HasOne(x => x.SuperTask).WithMany(x => x.FileProcessingTasks).HasForeignKey(x => x.SuperTaskId);
+
+            builder.HasMany(x => x.InvalidLines).WithOne(x => x.FileProcessingTask);
         }
     }
 }
