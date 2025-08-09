@@ -13,6 +13,7 @@ namespace Dispatcher.BLL.Mappers
                 dest => dest.FileProcessingTasks,
                 opt => opt.MapFrom(src => src.FileProcessingTasks.Select(t => new FileProcessingTaskRequest
                 {
+                    Id = t.Id,
                     LinkToFile = t.LinkToFile,
                     Status = t.Status,
                     SuperTaskId = t.SuperTaskId,

@@ -1,6 +1,7 @@
-﻿using Dispatcher.DAL.Enums;
+﻿using System.Collections.Concurrent;
+using TaskProcessor.Worker.Infrastructure.Enums;
 
-namespace Dispatcher.BLL.Models
+namespace TaskProcessor.Worker.Infrastructure.Models
 {
     public class FileProcessingTaskRequest
     {
@@ -17,5 +18,9 @@ namespace Dispatcher.BLL.Models
         public FileProcessingTaskStatus Status { get; set; }
 
         public Guid SuperTaskId { get; set; }
+
+        public ConcurrentBag<int> InvalidLines { get; } = [];
+
+        public bool IsFileCorrupted { get; set; }
     }
 }
