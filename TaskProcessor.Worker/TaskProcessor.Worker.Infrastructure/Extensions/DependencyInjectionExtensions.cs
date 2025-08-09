@@ -15,6 +15,7 @@ namespace TaskProcessor.Worker.Infrastructure.Extensions
         public static void AddServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<FileProcessingOptions>(configuration.GetSection("FileProcessing"));
+            services.Configure<RabbitMQConnection>(configuration.GetSection("RabbitMQ"));
 
             services.AddTransient<IMetricCalculator, LinesCountMetricCalculator>();
             services.AddTransient<IMetricCalculator, HighVolumeKeywordsCountMetricCalculator>();

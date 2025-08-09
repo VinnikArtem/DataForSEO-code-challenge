@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
+using TaskProcessor.Worker.Infrastructure.Models;
 using TaskProcessor.Worker.Infrastructure.RabbitMQ.Interfaces;
 
 namespace TaskProcessor.Worker.Infrastructure.RabbitMQ
@@ -7,13 +9,13 @@ namespace TaskProcessor.Worker.Infrastructure.RabbitMQ
     public class RabbitMqConnectionManager : IRabbitMqConnectionManager
     {
         private readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
-        private readonly IConfiguration _configuration;
+        private readonly RabbitMQConnection _rabbitMQConnection;
         private IConnection? _connection;
         private bool _disposed;
 
-        public RabbitMqConnectionManager(IConfiguration configuration)
+        public RabbitMqConnectionManager(IOptions<RabbitMQConnection> rabbitMQConnection)
         {
-            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _rabbitMQConnection = rabbitMQConnection?.Value ?? throw new ArgumentNullException(nameof(rabbitMQConnection));
         }
 
         public bool IsConnected => _connection != null && _connection.IsOpen && !_disposed;
@@ -41,9 +43,9 @@ namespace TaskProcessor.Worker.Infrastructure.RabbitMQ
 
                 var factory = new ConnectionFactory
                 {
-                    HostName = _configuration["RabbitMQ:HostName"],
-                    UserName = _configuration["RabbitMQ:UserName"],
-                    Password = _configuration["RabbitMQ:Password"]
+                    HostName = _rabbitMQConnection.HostName,
+                    UserName = _rabbitMQConnection.UserName,
+                    Password = _rabbitMQConnection.Password
                 };
 
                 _connection = await factory.CreateConnectionAsync();

@@ -1,6 +1,4 @@
-﻿using SharpCompress.Common;
-
-namespace TaskProcessor.Worker.Infrastructure
+﻿namespace TaskProcessor.Worker.Infrastructure
 {
     public struct Constants
     {
@@ -14,6 +12,7 @@ namespace TaskProcessor.Worker.Infrastructure
         public struct QueueNames
         {
             public const string SubtaskUpdate = "dispatcher.subtask_update";
+            public const string RunSuperTask = "worker.run_super_task";
         }
     }
 }

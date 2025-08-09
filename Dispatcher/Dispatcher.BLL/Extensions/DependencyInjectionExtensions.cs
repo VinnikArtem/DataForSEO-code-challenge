@@ -1,4 +1,5 @@
 ﻿using Dispatcher.BLL.Mappers;
+using Dispatcher.BLL.Models;
 using Dispatcher.BLL.Services;
 using Dispatcher.BLL.Services.Interfaces;
 using Dispatcher.BLL.Strategies.ResponseDeserialization;
@@ -13,6 +14,8 @@ namespace Dispatcher.BLL.Extensions
         public static void AddServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDALServices(configuration);
+
+            services.Configure<RabbitMQConnection>(configuration.GetSection("RabbitMQ"));
 
             services.AddTransient<IResponseDeserializer, TextPlainResponseDeserializer>();
 
