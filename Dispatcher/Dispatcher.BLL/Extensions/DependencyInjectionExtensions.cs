@@ -1,4 +1,5 @@
-﻿using Dispatcher.BLL.Mappers;
+﻿using Dispatcher.BLL.Consumers;
+using Dispatcher.BLL.Mappers;
 using Dispatcher.BLL.Models;
 using Dispatcher.BLL.Services;
 using Dispatcher.BLL.Services.Interfaces;
@@ -33,6 +34,8 @@ namespace Dispatcher.BLL.Extensions
 
             services.AddScoped<ITaskService, TaskService>();
             services.AddScoped<IFileProcessingTaskService, FileProcessingTaskService>();
+
+            services.AddHostedService<FileProcessingTaskUpdateConsumer>();
         }
     }
 }

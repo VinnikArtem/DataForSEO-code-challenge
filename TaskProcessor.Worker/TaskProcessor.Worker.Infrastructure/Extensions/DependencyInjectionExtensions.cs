@@ -29,6 +29,8 @@ namespace TaskProcessor.Worker.Infrastructure.Extensions
 
             services.AddSingleton<IRabbitMqConnectionManager, RabbitMqConnectionManager>();
             services.AddScoped<IRabbitMQPublisher, RabbitMQPublisher>();
+
+            services.AddSingleton<IFileProcessingService, FileProcessingService>();
         }
     }
 }

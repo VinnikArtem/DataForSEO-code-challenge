@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using TaskProcessor.Worker.Infrastructure.Models;
 using TaskProcessor.Worker.Infrastructure.RabbitMQ.Interfaces;
