@@ -10,15 +10,16 @@ namespace TaskProcessor.Worker.Consumers
 {
     public class FileProcessingConsumer : BackgroundService
     {
-        private readonly IFileProcessingService _fileProcessingService;
+        private readonly IServiceScopeFactory _scopeFactory;
         private readonly IRabbitMqConnectionManager _connectionManager;
+        private IFileProcessingService _fileProcessingService;
         private IChannel? _channel;
 
         public FileProcessingConsumer(
-            IFileProcessingService fileProcessingService,
+            IServiceScopeFactory scopeFactory,
             IRabbitMqConnectionManager connectionManager)
         {
-            _fileProcessingService = fileProcessingService ?? throw new ArgumentNullException(nameof(fileProcessingService));
+            _scopeFactory = scopeFactory ?? throw new ArgumentNullException(nameof(scopeFactory));
             _connectionManager = connectionManager ?? throw new ArgumentNullException(nameof(connectionManager));
         }
 
@@ -32,6 +33,10 @@ namespace TaskProcessor.Worker.Consumers
                 exclusive: false,
                 autoDelete: false
             );
+
+            using var scope = _scopeFactory.CreateScope();
+
+            _fileProcessingService = scope.ServiceProvider.GetRequiredService<IFileProcessingService>();
 
             await base.StartAsync(cancellationToken);
         }

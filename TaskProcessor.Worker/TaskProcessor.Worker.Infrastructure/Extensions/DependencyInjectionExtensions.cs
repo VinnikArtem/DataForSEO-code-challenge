@@ -21,16 +21,21 @@ namespace TaskProcessor.Worker.Infrastructure.Extensions
             services.AddTransient<IMetricCalculator, HighVolumeKeywordsCountMetricCalculator>();
             services.AddTransient<IMetricCalculator, MisspelledKeywordsCountMetricCalculator>();
 
+            services.AddHttpClient();
+
             services.AddScoped<IFileParser, JsonParser>();
 
-            services.AddScoped<IFileManager, FileManager>();
+            services.AddScoped<IFileManager>(x => new FileManager(
+                x.GetService<IHttpClientFactory>(),
+                "WorkerClient"));
+
             services.AddScoped<IArchiveExtractor, ArchiveExtractor>();
             services.AddScoped<IFileAnalyzer, FileAnalyzer>();
 
             services.AddSingleton<IRabbitMqConnectionManager, RabbitMqConnectionManager>();
             services.AddScoped<IRabbitMQPublisher, RabbitMQPublisher>();
 
-            services.AddSingleton<IFileProcessingService, FileProcessingService>();
+            services.AddScoped<IFileProcessingService, FileProcessingService>();
         }
     }
 }
