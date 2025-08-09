@@ -23,6 +23,9 @@ namespace Dispatcher.BLL.Mappers
                     IsFileCorrupted = t.IsFileCorrupted,
                     InvalidLines = t.InvalidLines.Select(l => l.LineNumber)
                 })));
+
+            CreateMap<SuperTask, BaseSuperTask>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id));
         }
     }
 }

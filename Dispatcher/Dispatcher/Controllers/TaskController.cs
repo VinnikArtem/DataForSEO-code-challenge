@@ -22,5 +22,21 @@ namespace Dispatcher.Controllers
 
             return Created();
         }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetTaskById(Guid id)
+        {
+            var task = await _taskService.GetSuperTaskByIdAsync(id);
+
+            return Ok(task);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllAsync()
+        {
+            var tasks = await _taskService.GetAllAsync();
+
+            return Ok(tasks);
+        }
     }
 }

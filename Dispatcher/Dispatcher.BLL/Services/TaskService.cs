@@ -6,6 +6,7 @@ using Dispatcher.DAL.Entities;
 using Dispatcher.DAL.Enums;
 using Dispatcher.DAL.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 
 namespace Dispatcher.BLL.Services
 {
@@ -51,6 +52,26 @@ namespace Dispatcher.BLL.Services
             var superTaskRequest = _mapper.Map<SuperTaskRequest>(superTask);
 
             await _rabbitMQPublisher.PublishMessageAsync(superTaskRequest, Constants.QueueNames.RunSuperTask);
+        }
+
+        public async Task<IEnumerable<BaseSuperTask>> GetAllAsync()
+        {
+            var tasks = await _unitOfWork.SuperTaskRepository.GetAllAsync();
+
+            if (tasks is null || !tasks.Any()) return [];
+
+            return _mapper.Map<IEnumerable<BaseSuperTask>>(tasks);
+        }
+
+        public async Task<SuperTaskRequest> GetSuperTaskByIdAsync(Guid id)
+        {
+            var task = await _unitOfWork.SuperTaskRepository.GetFirstOrDefaultAsync(
+                t => t.Id == id,
+                query => query.Include(st => st.FileProcessingTasks).ThenInclude(t => t.InvalidLines));
+
+            if (task == null) return default;
+
+            return _mapper.Map<SuperTaskRequest>(task);
         }
     }
 }
