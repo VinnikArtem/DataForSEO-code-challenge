@@ -12,15 +12,18 @@ namespace TaskProcessor.Worker.Consumers
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IRabbitMqConnectionManager _connectionManager;
-        private IFileProcessingService _fileProcessingService;
+        private readonly TaskCompletionSource _tcs = new();
+        private readonly ILogger<FileProcessingConsumer> _logger;
         private IChannel? _channel;
 
         public FileProcessingConsumer(
             IServiceScopeFactory scopeFactory,
-            IRabbitMqConnectionManager connectionManager)
+            IRabbitMqConnectionManager connectionManager,
+            ILogger<FileProcessingConsumer> logger)
         {
             _scopeFactory = scopeFactory ?? throw new ArgumentNullException(nameof(scopeFactory));
             _connectionManager = connectionManager ?? throw new ArgumentNullException(nameof(connectionManager));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public override async Task StartAsync(CancellationToken cancellationToken)
@@ -33,10 +36,6 @@ namespace TaskProcessor.Worker.Consumers
                 exclusive: false,
                 autoDelete: false
             );
-
-            using var scope = _scopeFactory.CreateScope();
-
-            _fileProcessingService = scope.ServiceProvider.GetRequiredService<IFileProcessingService>();
 
             await base.StartAsync(cancellationToken);
         }
@@ -52,21 +51,27 @@ namespace TaskProcessor.Worker.Consumers
             {
                 try
                 {
+                    await using var scope = _scopeFactory.CreateAsyncScope();
+
+                    var fileProcessingService = scope.ServiceProvider.GetRequiredService<IFileProcessingService>();
+
                     var messageBody = Encoding.UTF8.GetString(ea.Body.ToArray());
                     var superTaskRequest = JsonSerializer.Deserialize<SuperTaskRequest>(messageBody);
 
                     if (superTaskRequest?.FileProcessingTasks != null)
                     {
                         var tasks = superTaskRequest.FileProcessingTasks
-                            .Select(request => _fileProcessingService.ProcessFileAsync(request));
+                            .Select(request => fileProcessingService.ProcessFileAsync(request));
 
                         await Task.WhenAll(tasks);
                     }
 
                     await _channel!.BasicAckAsync(ea.DeliveryTag, multiple: false);
                 }
-                catch
+                catch (Exception ex)
                 {
+                    _logger.LogError(ex, "Something went wrong in FileProcessingConsumer");
+
                     await _channel!.BasicNackAsync(ea.DeliveryTag, multiple: false, requeue: true);
                 }
             };
@@ -77,6 +82,8 @@ namespace TaskProcessor.Worker.Consumers
                 consumer: consumer,
                 cancellationToken: stoppingToken
             );
+
+            await _tcs.Task;
         }
 
         public override async Task StopAsync(CancellationToken cancellationToken)

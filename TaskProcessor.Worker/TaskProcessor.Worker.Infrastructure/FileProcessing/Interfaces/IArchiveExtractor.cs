@@ -2,6 +2,6 @@
 {
     public interface IArchiveExtractor
     {
-        Task<IEnumerable<string>> ExtractAsync(string archivePath, string destinationDirectory);
+        Task<string> ExtractAsync(string archivePath, string destinationDirectory);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using SharpCompress.Common;
 using TaskProcessor.Worker.Infrastructure.Enums;
 using TaskProcessor.Worker.Infrastructure.FileProcessing.Interfaces;
 using TaskProcessor.Worker.Infrastructure.Models;
@@ -48,14 +49,9 @@ namespace TaskProcessor.Worker.Infrastructure.FileProcessing
 
                 var archiveName = Path.GetFileName(archivePath);
 
-                folderPath = Path.Combine(folderPath, archiveName);
+                var filePath = await _archiveExtractor.ExtractAsync(archivePath, folderPath);
 
-                var filePaths = await _archiveExtractor.ExtractAsync(archivePath, archiveName);
-
-                foreach (var filePath in filePaths)
-                {
-                    request = await _fileAnalyzer.AnalyzeAsync(filePath, request);
-                }
+                request = await _fileAnalyzer.AnalyzeAsync(filePath, request);
 
                 if (request.Status != FileProcessingTaskStatus.Error) request.Status = FileProcessingTaskStatus.Completed;
 

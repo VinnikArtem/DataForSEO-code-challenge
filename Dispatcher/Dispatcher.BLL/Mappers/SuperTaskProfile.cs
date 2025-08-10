@@ -21,7 +21,7 @@ namespace Dispatcher.BLL.Mappers
                     MisspelledKeywordsCount = t.MisspelledKeywordsCount,
                     LinesCount = t.LinesCount,
                     IsFileCorrupted = t.IsFileCorrupted,
-                    InvalidLines = t.InvalidLines.Select(l => l.LineNumber)
+                    InvalidLines = t.InvalidLines != null ? t.InvalidLines.Select(l => l.LineNumber) : Enumerable.Empty<int>(),
                 })));
 
             CreateMap<SuperTask, BaseSuperTask>()

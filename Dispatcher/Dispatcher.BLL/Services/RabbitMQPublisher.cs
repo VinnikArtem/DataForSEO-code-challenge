@@ -8,6 +8,7 @@ namespace Dispatcher.BLL.Services
     public class RabbitMQPublisher : IRabbitMQPublisher
     {
         private readonly IRabbitMqConnectionManager _connectionManager;
+        private IChannel? _channel;
 
         public RabbitMQPublisher(IRabbitMqConnectionManager connectionManager)
         {
@@ -16,9 +17,12 @@ namespace Dispatcher.BLL.Services
 
         public async Task PublishMessageAsync<T>(T message, string queue)
         {
-            using var channel = await _connectionManager.CreateChannelAsync();
+            if (_channel == null || !_connectionManager.IsConnected)
+            {
+                _channel = await _connectionManager.CreateChannelAsync();
+            }
 
-            await channel.QueueDeclareAsync(queue: queue, durable: true, exclusive: false, autoDelete: false);
+            await _channel.QueueDeclareAsync(queue: queue, durable: true, exclusive: false, autoDelete: false);
 
             var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(message));
 
@@ -27,7 +31,16 @@ namespace Dispatcher.BLL.Services
                 DeliveryMode = DeliveryModes.Persistent
             };
 
-            await channel.BasicPublishAsync(exchange: string.Empty, routingKey: queue, mandatory: true, basicProperties: props, body: body);
+            await _channel.BasicPublishAsync(exchange: string.Empty, routingKey: queue, mandatory: true, basicProperties: props, body: body);
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            if (_channel != null)
+            {
+                await _channel.CloseAsync();
+                await _channel.DisposeAsync();
+            }
         }
     }
 }

@@ -2,6 +2,7 @@
 using Dispatcher.BLL.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
@@ -13,7 +14,8 @@ namespace Dispatcher.BLL.Consumers
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IRabbitMqConnectionManager _connectionManager;
-        private IFileProcessingTaskService _fileProcessingTaskService;
+        private readonly TaskCompletionSource _tcs = new();
+        private readonly ILogger<FileProcessingTaskUpdateConsumer> _logger;
         private IChannel? _channel;
 
         public FileProcessingTaskUpdateConsumer(
@@ -35,10 +37,6 @@ namespace Dispatcher.BLL.Consumers
                 autoDelete: false
             );
 
-            using var scope = _scopeFactory.CreateScope();
-
-            _fileProcessingTaskService = scope.ServiceProvider.GetRequiredService<IFileProcessingTaskService>();
-
             await base.StartAsync(cancellationToken);
         }
 
@@ -53,18 +51,24 @@ namespace Dispatcher.BLL.Consumers
             {
                 try
                 {
+                    await using var scope = _scopeFactory.CreateAsyncScope();
+
+                    var fileProcessingTaskService = scope.ServiceProvider.GetRequiredService<IFileProcessingTaskService>();
+
                     var messageBody = Encoding.UTF8.GetString(ea.Body.ToArray());
                     var fileProcessingTaskRequest = JsonSerializer.Deserialize<FileProcessingTaskRequest>(messageBody);
 
                     if (fileProcessingTaskRequest != null)
                     {
-                        await _fileProcessingTaskService.UpdateAsync(fileProcessingTaskRequest);
+                        await fileProcessingTaskService.UpdateAsync(fileProcessingTaskRequest);
                     }
 
                     await _channel!.BasicAckAsync(ea.DeliveryTag, multiple: false);
                 }
-                catch
+                catch (Exception ex)
                 {
+                    _logger.LogError(ex, "Something went wrong in FileProcessingTaskUpdateConsumer");
+
                     await _channel!.BasicNackAsync(ea.DeliveryTag, multiple: false, requeue: true);
                 }
             };

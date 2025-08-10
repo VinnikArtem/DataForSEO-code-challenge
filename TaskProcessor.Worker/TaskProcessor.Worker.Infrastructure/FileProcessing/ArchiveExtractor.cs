@@ -1,39 +1,30 @@
-﻿using SharpCompress.Archives;
-using System.Collections.Concurrent;
+﻿using System.IO.Compression;
 using TaskProcessor.Worker.Infrastructure.FileProcessing.Interfaces;
 
 namespace TaskProcessor.Worker.Infrastructure.FileProcessing
 {
     public class ArchiveExtractor : IArchiveExtractor
     {
-        public async Task<IEnumerable<string>> ExtractAsync(string archivePath, string destinationDirectory)
+        public async Task<string> ExtractAsync(string archivePath, string destinationDirectory)
         {
             if (!File.Exists(archivePath))
                 throw new FileNotFoundException("Archive not found", archivePath);
 
-            var filePaths = new ConcurrentBag<string>();
-
             Directory.CreateDirectory(destinationDirectory);
 
-            using var archive = ArchiveFactory.Open(archivePath);
+            var fileName = Path.GetFileNameWithoutExtension(archivePath);
 
-            foreach (var entry in archive.Entries.Where(e => !e.IsDirectory))
-            {
-                var fullPath = Path.Combine(destinationDirectory, entry.Key);
+            var fullPath = Path.Combine(destinationDirectory, fileName);
 
-                filePaths.Add(fullPath);
+            using var originalFileStream = File.OpenRead(archivePath);
 
-                var directory = Path.GetDirectoryName(fullPath)!;
-                Directory.CreateDirectory(directory);
+            await using var fileStream = new FileStream(fullPath, FileMode.Create, FileAccess.Write);
 
-                using var entryStream = entry.OpenEntryStream();
+            using var decompressionStream = new GZipStream(originalFileStream, CompressionMode.Decompress);
 
-                await using var fileStream = new FileStream(fullPath, FileMode.Create, FileAccess.Write);
+            decompressionStream.CopyTo(fileStream);
 
-                await entryStream.CopyToAsync(fileStream);
-            }
-
-            return filePaths;
+            return fullPath;
         }
     }
 }

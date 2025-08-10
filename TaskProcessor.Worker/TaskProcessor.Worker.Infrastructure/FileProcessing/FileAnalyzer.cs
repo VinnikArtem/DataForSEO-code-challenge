@@ -37,7 +37,10 @@ namespace TaskProcessor.Worker.Infrastructure.FileProcessing
                     }
                     catch
                     {
-                        request.InvalidLines.Add(keyword.LineNumber);
+                        lock (_lock)
+                        {
+                            request.InvalidLines.Add(keyword.LineNumber);
+                        }
                     }
                 }
             }
